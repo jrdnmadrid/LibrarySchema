@@ -285,3 +285,104 @@ INSERT INTO Book_Loans VALUES (9, 1, 7, 'September 9, 2016', 'October 17, 2016')
 INSERT INTO Book_Loans VALUES (10, 1, 7, 'September 10, 2016', 'October 20, 2016'); 
 INSERT INTO Book_Loans VALUES (11, 2, 7, 'September 11, 2016', 'November 10, 2016');
 INSERT INTO Book_Loans VALUES (12, 2, 7, 'October 10, 2016', 'November 15, 2016'); 
+
+
+/*
+
+Now that we have completed all 9 of the parameters and have a working data set, it's time to create stored procedures in order to answer the below 7 questions: 
+
+1. How many copies of the book titled The Lost Tribe are owned by the library branch whose name
+is "Sharpstown"? 
+2. How many copies of the book titled The Lost Tribe are owned by each library branch?
+3. Retrieve the names of all borrowers who do not have any books checked out.
+4.   For   each   book   that   is   loaned   out   from   the   "Sharpstown"   branch   and   whose   DueDate   is   today,
+retrieve the book title, the borrower's name, and the borrower's address.
+5. For each library branch, retrieve the branch name and the total number of books loaned out from
+that branch.
+6. Retrieve the names, addresses, and number of books checked out for all borrowers who have more
+than five books checked out.
+7. For each book authored (or co-authored) by "Stephen King", retrieve the title and the number of
+copies owned by the library branch whose name is "Central"
+
+*/
+
+
+--I will address these in order, starting with number #1.
+
+--#1: How many copies of the book titled The Lost Tribe are owned by the library branch whose name is "Sharpstown"? 
+
+SELECT Library_branch.BranchName, Book.Title, Book_Copies.No_Of_Copies
+FROM Book_Copies 
+INNER JOIN Book
+ON Book_Copies.BookID = Book.BookID
+INNER JOIN Library_Branch
+ON Library_Branch.BranchID = Book_Copies.BranchID
+WHERE Book_Copies.BranchID = 1 AND Book_copies.BookID = 1
+
+--#2: How many copies of the book titled The Lost Tribe are owned by each library branch?
+
+SELECT Library_branch.BranchName, Book.Title, Book_Copies.No_Of_Copies
+FROM Book_Copies 
+INNER JOIN Book
+ON Book_Copies.BookID = Book.BookID
+INNER JOIN Library_Branch
+ON Library_Branch.BranchID = Book_Copies.BranchID
+WHERE Book_copies.BookID = 1
+
+--#3: Retrieve the names of all borrowers who do not have any books checked out. I chose the CardID, because if the CardID is null, it means they have not checked out a book. 
+--In order to categorize those who have checked out books in the past and also have them currently checked out, a separate column is needed.
+
+SELECT * 
+FROM Borrower
+LEFT JOIN Book_Loans
+ON Borrower.CardNo = Book_Loans.CardNo
+WHERE Book_Loans.CardNo IS NULL 
+
+--#4: For each book that is loaned out from the "Sharpstown" branch and whose DueDate is today, retrieve the book title, the borrower's name, and the borrower's address.
+
+SELECT Book_Loans.DueDate, Borrower.[Name], Borrower.[Address]
+FROM Book_Loans
+INNER JOIN Library_Branch
+ON Book_Loans.BranchID = Library_Branch.BranchID
+INNER JOIN Book
+ON Book_Loans.BookID = book.BookID
+INNER JOIN Borrower
+ON Book_Loans.CardNo = Borrower.CardNo
+WHERE Book_Loans.DueDate = GETDATE()
+
+--#5 For each library branch, retrieve the branch name and the total number of books loaned out from that branch.
+
+SELECT Library_Branch.BranchName, COUNT(Book_Loans.BookID) AS 'Total Number of Book Loans' 
+FROM Book_Loans
+INNER JOIN Library_Branch
+ON Book_Loans.BranchID = Library_Branch.BranchID
+GROUP BY Library_Branch.BranchName
+
+--#6: Retrieve the names, addresses, and number of books checked out for all borrowers who have more than five books checked out.
+
+SELECT Borrower.[Name], Borrower.[Address], COUNT(Borrower.CardNo) AS 'Total Number of Book Loans'
+FROM Book_Loans
+INNER JOIN Library_Branch
+ON Book_Loans.BranchID = Library_Branch.BranchID
+INNER JOIN Book
+ON Book_Loans.BookID = Book.BookID
+INNER JOIN Borrower
+ON Book_Loans.CardNo = Borrower.CardNo
+WHERE Book_Loans.DueDate > GETDATE() AND Book_Loans.CardNo > 5
+GROUP BY Borrower.[Name], Borrower.[Address];
+
+
+--7: For each book authored (or co-authored) by "Stephen King", retrieve the title and the number of copies owned by the library branch whose name is "Central"
+
+SELECT Book_Authors.Author_Name, Book_Copies.No_Of_Copies, Library_Branch.BranchName
+FROM Book
+INNER JOIN Book_Authors
+ON Book.BookID = Book_Authors.BookID
+INNER JOIN Book_Copies
+ON Book.BookID = Book_Copies.BookID
+INNER JOIN Library_Branch
+ON Library_Branch.BranchID = Book_Copies.BranchID
+WHERE Book_Authors.Author_Name = 'Stephen King' AND Library_Branch.BranchName = 'Central'
+
+
+--
