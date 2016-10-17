@@ -2,7 +2,7 @@
 I spent time compiling a schema for a library project at The Tech Academy. The full directions are below:
 
 SQL Drill
-Create a database schema for a library management system as described in the "libraryschema" picture that is also uploaded with the file. 
+Create a database schema for a library management system as described in the "libraryschema" picture that is also uploaded in the repo. 
 
 You may choose the data types for each field in each table in the schema. There are seven tables as shown in the library schema.
 
