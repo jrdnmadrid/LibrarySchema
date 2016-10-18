@@ -1,8 +1,16 @@
+USE master
+GO
+
+IF EXISTS (select * FROM sys.databases WHERE [Name] = 'LibrarySchema')
+DROP DATABASE LibrarySchema 
+
+CREATE DATABASE LibrarySchema
+GO
+
 USE LibrarySchema
 GO
 
 /*OVERVIEW: The goal of this execise is to create a Library Schema to answer the below questions, which are detailed later in the comments
-
 1. How many copies of the book titled The Lost Tribe are owned by the library branch whose name
 is "Sharpstown"? 
 2. How many copies of the book titled The Lost Tribe are owned by each library branch?
@@ -20,7 +28,7 @@ choice.
 */
 
 --STEP 1: I created the seven tables needed to start the library schema. These include Book, Book_Authors, Publisher, Book_Copies, Book_Loans, Library_Branch, Borrower. 
---I also made sure to link key relationships as shown in the diagram that is linked in the readme file. 
+--I also made sure to link key relationships as shown in the diagram in the readme file. 
 
 CREATE TABLE Book (BookID INT PRIMARY KEY, Title VARCHAR(30) NOT NULL, PublisherName VARCHAR(30))
 GO
@@ -40,12 +48,11 @@ GO
 CREATE TABLE Library_Branch (BranchID INT PRIMARY KEY, BranchName VARCHAR(30), [Address] VARCHAR (60))
 GO
 
-CREATE TABLE Borrower (CardNo INT PRIMARY KEY, [Name] VARCHAR(30), [Address] VARCHAR (60), Phone VARCHAR (13) 
+CREATE TABLE Borrower (CardNo INT PRIMARY KEY, [Name] VARCHAR(30), [Address] VARCHAR (60), Phone VARCHAR (13))
 GO
 
 /*STEP 2: Now, I will populate all the tables with dummy data in order to accomplish the original goals laid at the top.
 To answer the questions, there are a few parameters that need to be set: 
-
 1. There is a book called 'The Lost Tribe'.
 2. There is a library branch called 'Sharpstown' and one called 'Central'.
 3. There are at least 20 books in the BOOK table.
@@ -58,10 +65,9 @@ than 5 books loaned to them.
 9. There must be at least one book written by 'Stephen King'.
 */ 
 
---I will first handle parameters #1 and #3 and populate my dummy data accordingly. I will need to keep in mind there needs to be 10 authors in book_authors table as expressed in #4. 
+--I will first handle parameters #1 (there is a book called 'Lost Tribe') and #3 (there are at least 20 books in the Book table) and populate my dummy data accordingly. I will need to keep in mind there needs to be 10 authors in book_authors table as expressed in #4. 
 --I split each transaction in order to allow others to track each data point, normally I would aggregate the inserts all in one command in order to speed up processing time. 
---Parameter #1 ((there is a book called 'Lost Tribe'.)
---Parameter #3 (there are at least 20 books in the Book table.) 
+
 
 SELECT * FROM Book;
 
@@ -91,11 +97,8 @@ INSERT INTO Book VALUES (21, 'The Pearl', 'Penguin Books');
 
  COMMIT TRANSACTION
 
- --Now I will handle parameters #4  and #9 and begin filling out the authors for each of the books I have created above. 
- --Again, separating them out so you can see each line of code clearly. If this was a larger database I would group them accordingly. You will see this syntax throughout.
- --Parameter #4 (there are at least 10 authors in the BOOK_AUTHORS table.)
- --Parameter #9 (there must be at least one book written by 'Stephen King'.)
-
+ --Now I will handle parameters #4 (there are at least 10 authors in the BOOK_AUTHORS table) and #9 (there must be at least one book written by 'Stephen King') and begin filling out the authors for each of the books I have created above. 
+ --Again, separating them out so you can see each line of code clearly. If this was a larger database I would group them accordingly. 
 
  SELECT * FROM Book_Authors;
 
@@ -127,7 +130,6 @@ INSERT INTO Book_Authors VALUES (21, 'John Steinbeck');
 COMMIT TRANSACTION;
 
 /* I have the below steps left after completing the above actions: 
-
 2. There is a library branch called 'Sharpstown' and one called 'Central'.
 5. Each library branch has at least 10 book titles, and at least two copies of each of those titles.
 6. There are at least 8 borrowers in the BORROWER table, and at least 2 of those borrowers have more
@@ -136,9 +138,7 @@ than 5 books loaned to them.
 8. There are at least 50 loans in the BOOK_LOANS table.
 */ 
 
---Now I will handle parameters #2  and #7 for the Library_branch table
---Parameter #2 (there is a library branch called 'Sharpstown' and one called 'Central'.)
---Parameter #7 (there are at least 4 branches in the LIBRARY_BRANCH table.)
+--Now I will handle parameters #2 (there is a library branch called 'Sharpstown' and one called 'Central') and #7 (there are at least 4 branches in the LIBRARY_BRANCH table) for the Library_branch table
 
 SELECT * FROM Library_Branch
 
@@ -151,8 +151,8 @@ INSERT INTO Library_Branch VALUES (4, 'Peabody', '7 East Mount Vernon Place, Bal
 
 COMMIT TRANSACTION; 
 
---Now I will handle parameter #5. These titles do not need to be unique and titles can be duplicated across branches. 
--- Parameter #5 (each library branch has at least 10 book titles, and at least two copies of each of those titles.)
+--Now I will handle parameter #5 (each library branch has at least 10 book titles, and at least two copies of each of those titles).
+--These titles do not need to be unique and titles can be duplicated across branches. 
 
 SELECT *  FROM Book_Copies
 
@@ -211,13 +211,13 @@ INSERT INTO Book_Copies VALUES (19, 4, 2);
 COMMIT TRANSACTION
 
 --Now I will work on parameter #6 and parameter #8 to finalize the project, starting with first part of parameter 6. 
---Parameter 6 (there are at least 8 borrowers in the BORROWER table, and at least 2 of those borrowers have more than 5 books loaned to them.)
---Parameter 8 (there are at least 50 loans in the BOOK_LOANS table.)
+--Parameter 6 (There are at least 8 borrowers in the BORROWER table, and at least 2 of those borrowers have more than 5 books loaned to them.)
+--Parameter 8 (There are at least 50 loans in the BOOK_LOANS table.)
 
 
 SELECT * FROM Borrower;
 
---First part of the parameter #6 (there are at least 8 borrowers in the BORROWER tabl.e)
+--First part of the parameter #6 (there are at least 8 borrowers in the BORROWER table)
 
 BEGIN TRANSACTION
 
@@ -235,7 +235,7 @@ COMMIT TRANSACTION
 
 --I will now start parameter 8, as I will make sure to satisfy the second part of parameter #6 at the same time.  
 --Parameter 8 (There are at least 50 loans in the BOOK_LOANS table.)
---Second part of parameter 6 (at least 2 of those borrowers have more than 5 books loaned to them.). 
+--Second part of parameter 6 (at least 2 of those borrowers have more than 5 books loaned to them.). You will notice both John Jacobs and Jacob Smith (cardno. 1 and 2) have more than 5 books loaned to them
 
 SELECT * FROM Book_Loans
 
@@ -294,9 +294,7 @@ INSERT INTO Book_Loans VALUES (12, 2, 7, 'October 10, 2016', 'November 15, 2016'
 
 
 /*
-
 Now that we have completed all 9 of the parameters and have a working data set, it's time to create stored procedures in order to answer the below 7 questions: 
-
 1. How many copies of the book titled The Lost Tribe are owned by the library branch whose name
 is "Sharpstown"? 
 2. How many copies of the book titled The Lost Tribe are owned by each library branch?
@@ -309,8 +307,8 @@ that branch.
 than five books checked out.
 7. For each book authored (or co-authored) by "Stephen King", retrieve the title and the number of
 copies owned by the library branch whose name is "Central"
-
 */
+
 
 --I will address these in order, starting with number #1.
 
@@ -322,7 +320,7 @@ INNER JOIN Book
 ON Book_Copies.BookID = Book.BookID
 INNER JOIN Library_Branch
 ON Library_Branch.BranchID = Book_Copies.BranchID
-WHERE Book_Copies.BranchID = 1 AND Book_copies.BookID = 1
+WHERE Book_Copies.BranchID = 1 AND Book_copies.BookID = 1;
 
 --#2: How many copies of the book titled The Lost Tribe are owned by each library branch?
 
@@ -332,17 +330,16 @@ INNER JOIN Book
 ON Book_Copies.BookID = Book.BookID
 INNER JOIN Library_Branch
 ON Library_Branch.BranchID = Book_Copies.BranchID
-WHERE Book_copies.BookID = 1
+WHERE Book_copies.BookID = 1;
 
---#3: Retrieve the names of all borrowers who do not have any books checked out. 
---I chose the CardID, because if the CardID is null, it means they have not checked out a book. 
+--#3: Retrieve the names of all borrowers who do not have any books checked out. I chose the CardID, because if the CardID is null, it means they have not checked out a book. 
 --In order to categorize those who have checked out books in the past and also have them currently checked out, a separate column is needed.
 
 SELECT * 
 FROM Borrower
 LEFT JOIN Book_Loans
 ON Borrower.CardNo = Book_Loans.CardNo
-WHERE Book_Loans.CardNo IS NULL 
+WHERE Book_Loans.CardNo IS NULL;
 
 --#4: For each book that is loaned out from the "Sharpstown" branch and whose DueDate is today, retrieve the book title, the borrower's name, and the borrower's address.
 
@@ -354,7 +351,7 @@ INNER JOIN Book
 ON Book_Loans.BookID = book.BookID
 INNER JOIN Borrower
 ON Book_Loans.CardNo = Borrower.CardNo
-WHERE Book_Loans.DueDate = GETDATE()
+WHERE Book_Loans.DueDate = GETDATE();
 
 --#5 For each library branch, retrieve the branch name and the total number of books loaned out from that branch.
 
@@ -362,7 +359,7 @@ SELECT Library_Branch.BranchName, COUNT(Book_Loans.BookID) AS 'Total Number of B
 FROM Book_Loans
 INNER JOIN Library_Branch
 ON Book_Loans.BranchID = Library_Branch.BranchID
-GROUP BY Library_Branch.BranchName
+GROUP BY Library_Branch.BranchName;
 
 --#6: Retrieve the names, addresses, and number of books checked out for all borrowers who have more than five books checked out.
 
@@ -388,24 +385,5 @@ INNER JOIN Book_Copies
 ON Book.BookID = Book_Copies.BookID
 INNER JOIN Library_Branch
 ON Library_Branch.BranchID = Book_Copies.BranchID
-WHERE Book_Authors.Author_Name = 'Stephen King' AND Library_Branch.BranchName = 'Central'
+WHERE Book_Authors.Author_Name = 'Stephen King' AND Library_Branch.BranchName = 'Central';
 
-
---The last drill is to create a stored procedure that will execute one or more of these queries. For this, I will pick query #6 
-
-
-CREATE PROC GetBookLoansGreaterThanFive 
-AS 
-SELECT Borrower.[Name], Borrower.[Address], COUNT(Borrower.CardNo) AS 'Total Number of Book Loans'
-FROM Book_Loans
-INNER JOIN Library_Branch
-ON Book_Loans.BranchID = Library_Branch.BranchID
-INNER JOIN Book
-ON Book_Loans.BookID = Book.BookID
-INNER JOIN Borrower
-ON Book_Loans.CardNo = Borrower.CardNo
-WHERE Book_Loans.DueDate > GETDATE() AND Book_Loans.CardNo > 5
-GROUP BY Borrower.[Name], Borrower.[Address];
-GO
-
-EXEC GetBookLoansGreaterThanFive 
