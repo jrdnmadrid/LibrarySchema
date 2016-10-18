@@ -13,4 +13,4 @@ WHERE Book_Loans.DueDate > GETDATE() AND Book_Loans.CardNo > 5
 GROUP BY Borrower.[Name], Borrower.[Address]
 GO
 
-EXEC MostBooksChecked
+EXEC MostBooksChecked;

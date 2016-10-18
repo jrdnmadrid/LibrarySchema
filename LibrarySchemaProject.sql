@@ -239,6 +239,8 @@ COMMIT TRANSACTION
 
 SELECT * FROM Book_Loans
 
+BEGIN TRANSACTION
+
 INSERT INTO Book_Loans VALUES (1, 1, 1, 'January 17, 2016', 'January 18, 2016'); 
 INSERT INTO Book_Loans VALUES (2, 1, 1, 'January 22, 2016', 'October 30, 2016'); 
 INSERT INTO Book_Loans VALUES (3, 1, 1, 'January 25, 2016', 'October 17, 2016'); 
@@ -292,6 +294,7 @@ INSERT INTO Book_Loans VALUES (10, 1, 7, 'September 10, 2016', 'October 20, 2016
 INSERT INTO Book_Loans VALUES (11, 2, 7, 'September 11, 2016', 'November 10, 2016');
 INSERT INTO Book_Loans VALUES (12, 2, 7, 'October 10, 2016', 'November 15, 2016'); 
 
+COMMIT TRANSACTION
 
 /*
 Now that we have completed all 9 of the parameters and have a working data set, it's time to create stored procedures in order to answer the below 7 questions: 
@@ -386,4 +389,3 @@ ON Book.BookID = Book_Copies.BookID
 INNER JOIN Library_Branch
 ON Library_Branch.BranchID = Book_Copies.BranchID
 WHERE Book_Authors.Author_Name = 'Stephen King' AND Library_Branch.BranchName = 'Central';
-
